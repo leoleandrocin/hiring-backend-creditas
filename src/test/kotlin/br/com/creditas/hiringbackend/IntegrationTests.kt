@@ -23,66 +23,66 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class IntegrationTests {
 
-	@Autowired
-	lateinit var wireMockServer : WireMockServer
+    @Autowired
+    lateinit var wireMockServer : WireMockServer
 
-	@Autowired
-	lateinit var testRestTemplate : TestRestTemplate
+    @Autowired
+    lateinit var testRestTemplate : TestRestTemplate
 
-	@AfterEach
-	fun afterEach() {
-		wireMockServer.resetAll()
-	}
+    @AfterEach
+    fun afterEach() {
+        wireMockServer.resetAll()
+    }
 
-	@Test
-	fun `given a valid username when get user by username then return user data`() {
-		wireMockServer.stubFor(
-			WireMock
-				.get("/users/mirjahal")
-				.willReturn(WireMock.aResponse()
-					.withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-					.withBodyFile("githubUsersProfileSuccess.json")
-				)
-		)
+    @Test
+    fun `given a valid username when get user by username then return user data`() {
+        wireMockServer.stubFor(
+            WireMock
+                .get("/users/mirjahal")
+                .willReturn(WireMock.aResponse()
+                    .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .withBodyFile("githubUsersProfileSuccess.json")
+                )
+        )
 
-		val responseEntity = testRestTemplate.getForEntity("/users/{username}", User::class.java, "mirjahal")
+        val responseEntity = testRestTemplate.getForEntity("/users/{username}", User::class.java, "mirjahal")
 
-		assertEquals(HttpStatus.OK, responseEntity.statusCode)
-		assertEquals(UserDataBuilder.userData(), responseEntity.body)
-	}
+        assertEquals(HttpStatus.OK, responseEntity.statusCode)
+        assertEquals(UserDataBuilder.userData(), responseEntity.body)
+    }
 
-	@Test
-	fun `given a invalid username when get user by username then return status code not found`() {
-		wireMockServer.stubFor(
-			WireMock
-				.get("/users/@@@@@@@@")
-				.willReturn(WireMock.aResponse()
-					.withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-					.withBodyFile("githubUsersProfileNotFound.json")
-				)
-		)
+    @Test
+    fun `given a invalid username when get user by username then return status code not found`() {
+        wireMockServer.stubFor(
+            WireMock
+                .get("/users/@@@@@@@@")
+                .willReturn(WireMock.aResponse()
+                    .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .withBodyFile("githubUsersProfileNotFound.json")
+                )
+        )
 
-		val responseEntity = testRestTemplate.getForEntity("/users/{username}", ErrorMessage::class.java, "@@@@@@@@")
+        val responseEntity = testRestTemplate.getForEntity("/users/{username}", ErrorMessage::class.java, "@@@@@@@@")
 
-		assertEquals(HttpStatus.NOT_FOUND, responseEntity.statusCode)
-		assertEquals(ErrorMessage("Resource not found exception"), responseEntity.body)
-	}
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.statusCode)
+        assertEquals(ErrorMessage("Resource not found exception"), responseEntity.body)
+    }
 
-	@Test
-	fun `given a valid username when get user repositories by username then return a list of repositories`() {
-		wireMockServer.stubFor(
-			WireMock
-				.get("/users/mirjahal/repos")
-				.willReturn(WireMock.aResponse()
-					.withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-					.withBodyFile("githubUsersReposSuccess.json")
-				)
-		)
+    @Test
+    fun `given a valid username when get user repositories by username then return a list of repositories`() {
+        wireMockServer.stubFor(
+            WireMock
+                .get("/users/mirjahal/repos")
+                .willReturn(WireMock.aResponse()
+                    .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .withBodyFile("githubUsersReposSuccess.json")
+                )
+        )
 
-		val responseEntity = testRestTemplate.getForEntity("/users/{username}/repos", RepositoriesList::class.java, "mirjahal")
+        val responseEntity = testRestTemplate.getForEntity("/users/{username}/repos", RepositoriesList::class.java, "mirjahal")
 
-		assertEquals(HttpStatus.OK, responseEntity.statusCode)
-		assertEquals(UserDataBuilder.userRepositories(), responseEntity.body)
-	}
+        assertEquals(HttpStatus.OK, responseEntity.statusCode)
+        assertEquals(UserDataBuilder.userRepositories(), responseEntity.body)
+    }
 
 }
